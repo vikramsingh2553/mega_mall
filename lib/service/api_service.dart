@@ -5,21 +5,18 @@ import '../model/product_model.dart';
 import 'api_endpoint.dart';
 
 class ApiService {
-  static Future<ProductModel> fetchProduct(String productId) async {
-    String url = '${ApiEndpoints.product}/$productId';
-    Uri uri = Uri.parse(url);
-    Response response = await http.get(uri);
+  static Future<List<ProductModel>> fetchProducts() async {
+    final response = await http.get(Uri.parse('http://localhost:3000/api/products'));
+
     if (response.statusCode == 200) {
-      String body = response.body;
-      var json = jsonDecode(body);
-      ProductModel productModel = ProductModel.fromJson(json);
-      return productModel;
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => ProductModel.fromJson(item)).toList();
     } else {
-      throw 'Something went wrong';
+      throw Exception('Failed to load products');
     }
   }
 
-  static Future<List<ProductModel>> fetchProducts() async {
+  static Future<List<ProductModel>> fetchProduct() async {
     Uri uri = Uri.parse(ApiEndpoints.product);
     Response response = await http.get(uri);
     if (response.statusCode == 200) {
@@ -62,8 +59,8 @@ class ApiService {
     }
   }
 
-  static Future<ProductModel> deleteProduct(String productId) async {
-    String url = '${ApiEndpoints.product}/$productId';
+  static Future<ProductModel> deleteProduct(String id) async {
+    String url = '${ApiEndpoints.product}/$id';
     Uri uri = Uri.parse(url);
     Response response = await http.delete(uri);
     String body = response.body;
