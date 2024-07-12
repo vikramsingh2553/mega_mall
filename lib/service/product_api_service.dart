@@ -7,7 +7,7 @@ import 'api_endpoint.dart';
 class ProductApiService {
   static Future<List<ProductModel>> fetchProducts() async {
     final response =
-        await http.get(Uri.parse('http://192.168.1.37:3000/api/products'));
+        await http.get(Uri.parse('${ApiEndpoints.product}'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -18,7 +18,7 @@ class ProductApiService {
   }
 
   static Future<String> addProduct(ProductModel productModel) async {
-    Uri uri = Uri.parse('http://192.168.1.37:3000/api/products');
+    Uri uri = Uri.parse('${ApiEndpoints.product}s');
     Map<String, dynamic> map = productModel.toJson();
     String mapStr = jsonEncode(map);
     final response = await http.post(uri, body: mapStr, headers: {
