@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mega_mall/model/product_model.dart';
+import 'package:mega_mall/service/product_api_service.dart';
 
 class AddProductScreen extends StatefulWidget {
   final Function(ProductModel) onAdd;
@@ -14,8 +15,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  bool isLoading = false;
+  String errorMessage = '';
 
-  void addProduct() {
+  void addProduct() async {
     final String name = nameController.text;
     final String description = descriptionController.text;
     final double? price = double.tryParse(priceController.text);
@@ -27,8 +30,25 @@ class _AddProductScreenState extends State<AddProductScreen> {
         description: description,
         price: price,
       );
-      widget.onAdd(newProduct);
-      Navigator.pop(context);
+
+      setState(() {
+        isLoading = true;
+        errorMessage = '';
+      });
+
+      try {
+        print('Sending request to add product: $newProduct');
+        await ProductApiService.addProduct(newProduct);
+        print('Product added successfully');
+        widget.onAdd(newProduct);
+        Navigator.pop(context);
+      } catch (e) {
+        print('Error occurred while adding product: $e');
+        setState(() {
+          errorMessage = 'Failed to add product: $e';
+          isLoading = false;
+        });
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter all required fields')),
@@ -61,10 +81,19 @@ class _AddProductScreenState extends State<AddProductScreen> {
               decoration: const InputDecoration(labelText: 'Product Price'),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
+            isLoading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
               onPressed: addProduct,
               child: const Text('Add Product'),
             ),
+            if (errorMessage.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.red),
+              ),
+            ],
           ],
         ),
       ),

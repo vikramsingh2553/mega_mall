@@ -25,11 +25,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void editProduct() {
-    final String name = nameController.text;
-    final String description = descriptionController.text;
-    final double? price = double.tryParse(priceController.text);
+    final String name = nameController.text.trim();
+    final String description = descriptionController.text.trim();
+    final double? price = double.tryParse(priceController.text.trim());
 
-    if (name.isNotEmpty && description.isNotEmpty && price != null) {
+    if (name.isNotEmpty && description.isNotEmpty && price != null && price >= 0) {
       final updatedProduct = ProductModel(
         id: widget.product.id,
         name: name,
@@ -39,8 +39,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
       widget.onEdit(updatedProduct);
       Navigator.pop(context);
     } else {
+      String errorMessage = 'Please enter all required fields';
+      if (price != null && price < 0) {
+        errorMessage = 'Price must be a non-negative number';
+      } else if (name.isEmpty || description.isEmpty) {
+        errorMessage = 'Please fill in all fields';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter all required fields')),
+        SnackBar(content: Text(errorMessage)),
       );
     }
   }

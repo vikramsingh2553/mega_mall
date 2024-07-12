@@ -29,7 +29,7 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> deleteProduct(String productId) async {
     try {
-      await ProductApiService.deleteProduct(productId);
+      await ProductApiService.deleteProduct(productId );
       await fetchProducts();
     } catch (e) {
       print('Error deleting product: $e');

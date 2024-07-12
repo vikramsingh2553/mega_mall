@@ -21,7 +21,7 @@ class ProductApiService {
     Uri uri = Uri.parse('http://192.168.1.37:3000/api/products');
     Map<String, dynamic> map = productModel.toJson();
     String mapStr = jsonEncode(map);
-    Response response = await http.post(uri, body: mapStr, headers: {
+    final response = await http.post(uri, body: mapStr, headers: {
       'Content-Type': 'application/json',
     });
     if (response.statusCode == 201) {
@@ -31,28 +31,37 @@ class ProductApiService {
     }
   }
 
-  static Future<String> updateProduct(
-      String productId, ProductModel productModel) async {
-    Map<String, dynamic> map = productModel.toJson();
-    String mapStr = jsonEncode(map);
-    Uri uri = Uri.parse('${ApiEndpoints.product}/$productId');
-    Response response = await http.put(uri, body: mapStr, headers: {
-      'Content-Type': 'application/json',
-    });
-    if (response.statusCode == 200) {
-      return 'Product updated successfully';
-    } else {
-      throw 'Something went wrong';
+  static Future<String> updateProduct(String productId, ProductModel productModel) async {
+    try {
+      Map<String, dynamic> map = productModel.toJson();
+      String mapStr = jsonEncode(map);
+      Uri uri = Uri.parse('${ApiEndpoints.product}/$productId');
+      Response response = await http.put(uri, body: mapStr, headers: {
+        'Content-Type': 'application/json',
+      });
+      if (response.statusCode == 200) {
+        return 'Product updated successfully';
+      } else {
+        throw 'Failed to update product';
+      }
+    } catch (e) {
+      throw 'Error updating product: $e';
     }
   }
 
-  static Future<ProductModel> deleteProduct(String id) async {
-    String url = '${ApiEndpoints.product}/$id';
-    Uri uri = Uri.parse(url);
+
+  static Future<void> deleteProduct(String productId) async {
+    if (productId == null) {
+      throw 'Product ID cannot be null';
+    }
+
+    Uri uri = Uri.parse('${ApiEndpoints.product}/$productId');
     Response response = await http.delete(uri);
-    String body = response.body;
-    var json = jsonDecode(body);
-    ProductModel productModel = ProductModel.fromJson(json);
-    return productModel;
+
+    if (response.statusCode == 200) {
+      print('Product deleted successfully');
+    } else {
+      throw 'Failed to delete product: ${response.statusCode}';
+    }
   }
-}
+  }

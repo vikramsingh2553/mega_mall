@@ -1,10 +1,11 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../model/product_model.dart';
 import '../service/product_api_service.dart';
+import 'add_product_screen.dart';
 import 'detail_screen.dart';
+import 'edit_product_scren.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -59,10 +60,21 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> editProduct(ProductModel product) async {
+
+  Future<void> updateProduct(ProductModel product) async {
+    try {
+      await ProductApiService.updateProduct(product.id ,product);
+      await fetchProducts();
+    } catch (e) {
+      print('Error editing product: $e');
+      setState(() {
+        errorMessage = 'Error editing product: $e';
+      });
+    }
   }
 
-  @override
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,20 +134,69 @@ class _HomeScreenState extends State<HomeScreen> {
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.blue),
                     onPressed: () {
-                      editProduct(product);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProductScreen(
+                            product: product,
+                            onEdit: (updatedProduct) {
+                              updateProduct(updatedProduct);
+                            },
+                          ),
+                        ),
+                      );
                     },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      deleteProduct(product.id);
-                    },
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Confirm Deletion'),
+                    content: Text('Are you sure you want to delete ${product.name}?'),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: Text('Delete'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          deleteProduct(product.id);
+                        },
+                      ),
+                    ],
                   ),
+                );
+              },
+            ),
+
+
                 ],
               ),
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddProductScreen(
+                onAdd: (ProductModel product) {
+                  addProduct(product);
+                },
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.cyan,
       ),
     );
   }
