@@ -4,9 +4,10 @@ import 'package:http/http.dart';
 import '../model/product_model.dart';
 import 'api_endpoint.dart';
 
-class ApiService {
+class ProductApiService {
   static Future<List<ProductModel>> fetchProducts() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/api/products'));
+    final response =
+        await http.get(Uri.parse('http://192.168.1.37:3000/api/products'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -16,29 +17,13 @@ class ApiService {
     }
   }
 
-  static Future<List<ProductModel>> fetchProduct() async {
-    Uri uri = Uri.parse(ApiEndpoints.product);
-    Response response = await http.get(uri);
-    if (response.statusCode == 200) {
-      String body = response.body;
-      List<Map<String, dynamic>> listMap = jsonDecode(body);
-      List<ProductModel> productList = [];
-      for (int i = 0; i < listMap.length; i++) {
-        ProductModel productModel = ProductModel.fromJson(listMap[i]);
-        productList.add(productModel);
-      }
-
-      return productList;
-    } else {
-      throw 'Something went wrong';
-    }
-  }
-
   static Future<String> addProduct(ProductModel productModel) async {
-    Uri uri = Uri.parse(ApiEndpoints.product);
+    Uri uri = Uri.parse('http://192.168.1.37:3000/api/products');
     Map<String, dynamic> map = productModel.toJson();
     String mapStr = jsonEncode(map);
-    Response response = await http.post(uri, body: mapStr);
+    Response response = await http.post(uri, body: mapStr, headers: {
+      'Content-Type': 'application/json',
+    });
     if (response.statusCode == 201) {
       return 'Product added successfully';
     } else {
@@ -51,7 +36,9 @@ class ApiService {
     Map<String, dynamic> map = productModel.toJson();
     String mapStr = jsonEncode(map);
     Uri uri = Uri.parse('${ApiEndpoints.product}/$productId');
-    Response response = await http.put(uri, body: mapStr);
+    Response response = await http.put(uri, body: mapStr, headers: {
+      'Content-Type': 'application/json',
+    });
     if (response.statusCode == 200) {
       return 'Product updated successfully';
     } else {
@@ -65,8 +52,7 @@ class ApiService {
     Response response = await http.delete(uri);
     String body = response.body;
     var json = jsonDecode(body);
-    ProductModel productModel =
-    ProductModel.fromJson(json);
+    ProductModel productModel = ProductModel.fromJson(json);
     return productModel;
   }
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mega_mall/provider/auth_provider.dart';
+import 'package:mega_mall/provider/user_provider.dart';
 import 'package:mega_mall/provider/product_provider.dart';
+import 'package:mega_mall/screen/home_screen.dart';
 
 import 'package:provider/provider.dart';
 
-import 'login/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const LoginScreen(),
+        home:  HomeScreen(),
       ),
     );
   }

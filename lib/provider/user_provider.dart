@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mega_mall/model/user_model.dart';
 
+
+import '../model/user_model.dart';
 import '../service/user_service.dart';
-
 
 class UserProvider extends ChangeNotifier {
   final UserService _userService = UserService();

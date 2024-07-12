@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mega_mall/service/api_endpoint.dart';
+
 import '../model/user_model.dart';
 
 class UserService {
-  final String baseUrl = 'http://localhost:3000/api';
-
   Future<bool> register(UserModel user) async {
-    final url = Uri.parse('$baseUrl/register');
+    final url = Uri.parse('${ApiEndpoints}/register');
     final response = await http.post(url);
 
     if (response.statusCode == 200) {
@@ -16,7 +17,7 @@ class UserService {
   }
 
   Future<bool> login(UserModel user) async {
-    final url = Uri.parse('$baseUrl/login');
+    final url = Uri.parse('${ApiEndpoints}/login');
     final response = await http.post(url);
 
     if (response.statusCode == 200) {

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mega_mall/service/api_service.dart';
+import 'package:mega_mall/service/product_api_service.dart';
 
 import '../model/product_model.dart';
 
 
 class ProductProvider extends ChangeNotifier {
-  final ApiService apiService = ApiService();
-  List<ProductModel> products = [];
+  final ProductApiService apiService = ProductApiService();
+  List<ProductApiService> products = [];
 
   Future<void> fetchProducts() async {
     try {
-      List<ProductModel> fetchedProducts = await ApiService.fetchProducts();
+      List<ProductApiService> fetchedProducts = (await ProductApiService.fetchProducts()).cast<ProductApiService>();
       products = fetchedProducts;
       notifyListeners();
     } catch (e) {
@@ -20,16 +20,16 @@ class ProductProvider extends ChangeNotifier {
 
   Future<void> addProduct(ProductModel product) async {
     try {
-      await ApiService.addProduct(product);
+      await ProductApiService.addProduct(product);
       await fetchProducts();
     } catch (e) {
       print('Error adding product: $e');
     }
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<void> deleteProduct(String productId) async {
     try {
-      await ApiService.deleteProduct(id);
+      await ProductApiService.deleteProduct(productId);
       await fetchProducts();
     } catch (e) {
       print('Error deleting product: $e');
